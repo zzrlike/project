@@ -1,0 +1,32 @@
+// 登录接口需要携带的参数类型
+export interface loginForm{ 
+  username: string,
+  password:string
+}
+interface dataType{ 
+  token:Number
+}
+// 登录接口返回的数据类型
+export interface loginReqData { 
+  code: number,
+  data:dataType
+}
+interface userinfo { 
+  userId: number,
+  avatar: string,
+  username: string,
+  password: string,
+  desc: string,
+  roles: string[],
+  buttons: string[],
+  routes: string[],
+  token:string
+}
+interface user { 
+  checkUser:userinfo
+}
+// 定义服务器返回用户信息相关的类型
+export interface userResopnenseData { 
+  code: number,
+  data:user
+}
