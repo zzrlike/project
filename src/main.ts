@@ -18,5 +18,8 @@ Mock.setup({
 });
 // 引入路由
 import router from '@/router'
+// 引入仓库
+import pinia from "./store/index.ts";
+app.use(pinia)
 app.use(router)
 app.mount("#app");
