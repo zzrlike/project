@@ -1,6 +1,7 @@
 import SvgIcon from './SvgIcon/index.vue'
 import Paginaction from './Paginaction/index.vue'
-const allGloableComponent = { SvgIcon, Paginaction }
+import Category from './Category/index.vue'
+const allGloableComponent = { SvgIcon, Paginaction,Category }
 // 引入element-plus提供全部图标组件
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 // 对外暴露插件对象

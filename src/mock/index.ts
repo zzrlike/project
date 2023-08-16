@@ -45,12 +45,12 @@ Mock.mock('/api/user/login', 'post', (options) => {
 });
 
 // 模拟获取用户信息接口
-Mock.mock('/api/user/info', 'get', (options) => {
-//   const token = options.headers['Authorization'];
-    const token = options.Authorization;
+Mock.mock('/api/user/info', 'get', (request:any) => {
+
+    // const token = options.Authorization;
   // 验证token
  //查看用户信息是否包含有次token用户
-  const checkUser = createUserList().find((item) => item.token === token)
+  const checkUser = createUserList().find((item) => item.token === 'Admin Token')
   //没有返回失败的信息
   if (!checkUser) {
       return { code: 201, data: { message: '获取用户信息失败' } }
