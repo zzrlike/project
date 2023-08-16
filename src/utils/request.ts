@@ -1,12 +1,17 @@
 // 封装axios二次封装，使用拦截器
 import { ElMessage} from 'element-plus'
 import axios from 'axios'
+import useUserStore from '@/store/modules/user.ts'
 const request = axios.create({
   // 基础路径
   baseURL: import.meta.env.VITE_APP_BASE_API,
   timeout:5000
 })
 request.interceptors.request.use(config => {
+    const userStore=useUserStore()
+    if (userStore.token) { 
+        config.headers.token=userStore.token
+    }
     return config;
 });
 //响应拦截器

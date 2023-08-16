@@ -5,6 +5,7 @@ import "element-plus/dist/index.css";
 import App from "./App.vue";
 // svg插件的需要得配置
 import 'virtual:svg-icons-register'
+import './permission.ts'
 const app = createApp(App);
 // 引入自定义插件对象
 import gloalComponent from './components';

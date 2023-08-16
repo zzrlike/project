@@ -26,8 +26,9 @@ import times from '../../utils/times.ts'
 import { User, Lock } from '@element-plus/icons-vue'
 import useUserStore from '@/store/modules/user'
 import { ElNotification } from 'element-plus';
-import { useRouter } from 'vue-router';
-const router =useRouter()
+import { useRouter,useRoute } from 'vue-router';
+const router = useRouter()
+const route=useRoute()
 const useStore=useUserStore()
 import { ref } from 'vue';
 const loginRef=ref()
@@ -35,7 +36,7 @@ const loginRef=ref()
 let loading=ref(false)
 const loginFrom = ref({
   username: 'admin',
-  password:'111111'
+  password:'atguigu123'
 })
 // 登录按钮实现的业务
 const loginBtn = async () => { 
@@ -43,7 +44,8 @@ const loginBtn = async () => {
   try {
     loading.value=true
     await useStore.userLogin(loginFrom.value)
-    router.push('/')
+    let redirect:any=route.query.redirect
+    router.push({path:redirect||'/'})
     ElNotification({
       type: 'success',
       message: '欢迎回来',
@@ -71,7 +73,7 @@ const rules = {
       required: true, message: '请输入密码', trigger:'blur'
     },
     {
-       required: true,min:4,max:10,message:'密码长度在 4-10位之间',trigger:'blur'
+       required: true,min:4,max:15,message:'密码长度在 4-15位之间',trigger:'blur'
     }
   ]
 }
