@@ -13,7 +13,7 @@
           <el-table-column label="SPU操作">
             <template #="{row}">
               <el-button type="primary" icon="Plus" size="small" title="添加SPU"></el-button>
-              <el-button type="primary" icon="edit" size="small" title="修改SPU" @click="updateSpu"></el-button>
+              <el-button type="primary" icon="edit" size="small" title="修改SPU" @click="updateSpu(row)"></el-button>
               <el-button type="primary" icon="View" size="small" title="查看SPU列表"></el-button>
               <el-button type="primary" icon="Delete" size="small" title="删除已有SPU"></el-button>
             </template>
@@ -34,14 +34,14 @@
      <!-- 添加sku的子组件 -->
      <sku-from v-show="scene==2"></sku-from>
      <!-- 添加SPU|修改SPU子组件 -->
-     <spu-from v-show="scene==1" @changeScene="changeScene"></spu-from>
+     <spu-from v-show="scene==1" ref="SpuFromRrf" @changeScene="changeScene"></spu-from>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import type {HasSpuResponseData } from '@/api/product/spu/type.ts'
+import type {HasSpuResponseData,SpuData } from '@/api/product/spu/type.ts'
 import { reqHasSpu } from '../../../api/product/spu/index.ts';
 import useCategotyStore from '@/store/modules/category.ts'
 let categoryStore = useCategotyStore()
@@ -71,19 +71,32 @@ const getHasSpu = async() => {
     total.value=res.data.total
   }
 }
+// 获取子组件实例
+let SpuFromRrf:any=ref()
 // 添加新的spu按钮的回调
 const addSpu = () => { 
   // 切换为场景1：添加与修改已有的SPU结构->spuForm
-  scene.value=1
+  scene.value = 1
+  SpuFromRrf.value.initAddSpu(categoryStore.c3Id)
 }
 // 子组件spuFrom绑定的自定义事件：目前让子组件切换场景为0
-const changeScene = (num: number) => { 
-  scene.value=num
+const changeScene = (obj:any) => { 
+  scene.value = obj.flag
+  if (obj.params == 'update') { 
+    // 留在当前页
+    getHasSpu(pageNo.value)
+  }else{ 
+      // 再次获取全部的数据
+     getHasSpu()
+  }
+
 }
+
 // 修改已有的spu的按钮的回调
-const updateSpu = () => { 
+const updateSpu = (row:SpuData) => { 
     // 切换为场景1：添加与修改已有的SPU结构->spuForm
-  scene.value=1
+  scene.value = 1
+  SpuFromRrf.value.initHasSpuData(row)
 }
 </script>
 
