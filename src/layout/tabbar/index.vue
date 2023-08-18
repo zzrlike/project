@@ -47,7 +47,7 @@ const settingStore = useSettingStore()
 import useUserStore from '@/store/modules/user.ts'
 const userStore=useUserStore()
 const changicon = () => { 
-  settingStore.icon=!settingStore.icon
+  // settingStore.icon=!settingStore.icon
 }
 // 点击刷新按钮
 const updateRefsh = () => {
