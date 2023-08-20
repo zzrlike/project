@@ -1,13 +1,170 @@
 <template>
-  <div>
-    sku管理
-  </div>
+  <el-card>
+    <el-table border style="margin:10px 0px" :data="skuArr">
+      <el-table-column label="序号" type="index" align="center" width="80px"></el-table-column>
+      <el-table-column label="名称" show-overflow-tooltip width="150px" prop="skuName"></el-table-column>
+      <el-table-column label="描述" show-overflow-tooltip width="150px" prop="skuDesc"></el-table-column>
+      <el-table-column label="图片" width="150px">
+        <template #="{row}">
+          <img :src="row.skuDefaultImg" style="width:100px;height:100px"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="重量" width="150px" prop="weight"></el-table-column>
+      <el-table-column label="价格" width="150px" prop="price"></el-table-column>
+      <el-table-column label="操作" width="220px" fixed="right">
+        <template #="{row}">
+          <el-button type="primary" size="small" :icon="row.isSale==1?'Bottom':'Top'" @click="updateSale(row)"></el-button>
+          <el-button type="primary" size="small" icon="edit" @click="updateSku"></el-button>
+          <el-button type="primary" size="small" icon="InfoFilled" @click="findSku(row)"></el-button>
+            <el-popconfirm :title="`你确定要删除${row.skuName}商品吗?`" width="200px" @confirm="removeById(row)">
+              <template #reference>
+                <el-button type="primary" size="small" icon="delete"></el-button>
+              </template>
+            </el-popconfirm>
+        </template>
+      </el-table-column>
+    </el-table>
+        <el-pagination
+          v-model:current-page="pageNo"
+          v-model:page-size="pageSize"
+          :page-sizes="[5,10, 20, 30]"
+          :small="small"
+          :background="true"
+          layout="prev, pager, next, jumper,->,sizes,total"
+          :total="total"
+          @size-change="getHasSku"
+          @current-change="getHasSku"
+        />
+        <!-- 抽屉组件 -->
+        <el-drawer v-model="drawer">
+            <template #header>
+              <h4>查看商品详情</h4>
+            </template>
+            <template #default>
+              <el-row style="margin:10px 0px">
+                <el-col :span="6">名称</el-col>
+                <el-col :span="18">{{ skuInfo.skuName }}</el-col>
+              </el-row>
+              <el-row style="margin:10px 0px">
+                <el-col :span="6">描述</el-col>
+                <el-col :span="18">{{ skuInfo.skuDesc }}</el-col>
+              </el-row>
+              <el-row style="margin:10px 0px">
+                <el-col :span="6">价格</el-col>
+                <el-col :span="18">{{ skuInfo.price }}</el-col>
+              </el-row>
+              <el-row style="margin:10px 0px">
+                <el-col :span="6">平台属性</el-col>
+                <el-col :span="18">
+                  <el-tag type="danger" style="margin:0px 5px" v-for="item in skuInfo.skuAttrValueList">{{ item.valueName }}</el-tag>
+                </el-col>
+              </el-row>
+              <el-row style="margin:10px 0px">
+                <el-col :span="6">销售属性</el-col>
+                <el-col :span="18">
+                  <el-tag type="info" style="margin:0px 5px" v-for="item in skuInfo.skuSaleAttrValueList">{{ item.saleAttrValueName}}</el-tag>
+                </el-col>
+              </el-row>
+              <el-row style="margin:10px 0px">
+                <el-col :span="6">商品图片</el-col>
+                <el-col :span="18">
+                   <el-carousel :interval="4000" type="card" height="100px">
+                      <el-carousel-item v-for="item in skuInfo.skuImageList" :key="item.id">
+                        <img :src="item.imgUrl" style="width:100%;height:100%"/>
+                      </el-carousel-item>
+                    </el-carousel>
+                </el-col>
+              </el-row>
+            </template>
+          </el-drawer>
+  </el-card>
 </template>
 
 <script setup lang="ts">
-
+import { ref } from "vue";
+import { ElMessage } from 'element-plus'
+import { reqSkuList,reqSaleSKu,reqCancelSale,reqSkuInfo,reqRemoveSku } from '@/api/product/sku'
+// 分页器当前页码
+let pageNo = ref<number>(1)
+// 每一页展示几条数据
+let pageSize = ref<number>(10)
+// 总页数
+let total = ref([])
+// 存放请求回来的数据源
+let skuArr=ref([])
+let getHasSku = async (pager = 1) => { 
+  pageNo.value=pager
+  let res = await reqSkuList(pageNo.value, pageSize.value)
+  if (res.code == 200) { 
+    total.value = res.data.total
+    skuArr.value=res.data.records
+  }
+}
+getHasSku()
+// 商品的上架与下架的
+const updateSale = async(row:any) => { 
+  if (row.isSale == 1) {
+    // 如果当前的商品issale=1说明时上架状态-》更新为下架
+    let res = await reqCancelSale(row.id)
+    if (res.code == 200) {
+      ElMessage.success('下架成功')
+      getHasSku()
+    } else { 
+      ElMessage.error('下架失败')
+    }
+  } else { 
+    let res = await reqSaleSKu(row.id)
+    if (res.code == 200) {
+      ElMessage.success('上架成功')
+      getHasSku()
+    } else { 
+      ElMessage.error('上架失败')
+    }
+  }
+  
+}
+// 更新已有的sku
+const updateSku = () => { 
+  ElMessage.success('程序员在努力更新中')
+}
+// 控制抽屉的显示与隐藏
+let drawer = ref(false)
+// 展示抽屉
+let skuInfo=ref([])
+const findSku = async(row) => { 
+  drawer.value = true
+  // 获取商品详情
+  let res = await reqSkuInfo(row.id)
+  skuInfo.value=res.data
+  
+  
+}
+// 删除某一个已有的商品
+const removeById = async(row) => { 
+  let res = await reqRemoveSku(row.id)
+  if (res.code == 200) {
+    ElMessage.success('删除成功')
+    getHasSku(skuArr.value.length>1?pageNo.value:pageNo.value-1)
+  } else { 
+    ElMessage.error('删除失败')
+  }
+}
 </script>
 
 <style scoped>
+.el-carousel__item h3 {
+  color: #475669;
+  opacity: 0.75;
+  line-height: 200px;
+  margin: 0;
+  text-align: center;
+}
 
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+
+.el-carousel__item:nth-child(2n + 1) {
+  background-color: #d3dce6;
+}
 </style>
