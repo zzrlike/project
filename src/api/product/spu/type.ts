@@ -91,3 +91,27 @@ export interface HasSaleAttr {
 export interface HasSaleAttrResponseData extends ResponseData{
   data: HasSaleAttr[]
 }
+
+
+export interface SkuData { 
+  category3Id: string | number,
+  spuId: string | number,
+  tmId: string | number,
+  skuName: string,
+  price: string | number,
+  weight: string,
+  skuDesc: string,
+  skuAttrValueList: [{
+    attrId: number|string,
+    valueId:number|string
+  }],
+  skuSaleAttrValueList: [{
+    saleAttrId: number|string,
+    saleAttrValueId:number|string
+  }],
+  skuDefaultImg:string
+}
+// 获取sku接口的ts类型
+export interface SKuInfoData extends ResponseData { 
+  data:SkuData[]
+}
