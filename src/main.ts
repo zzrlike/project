@@ -2,6 +2,8 @@ import { createApp } from "vue";
 import ElementPlus from "element-plus";
 // 引入element-plus插件与样式
 import "element-plus/dist/index.css";
+// 暗黑模式需要的样式
+import 'element-plus/theme-chalk/dark/css-vars.css'
 import App from "./App.vue";
 // svg插件的需要得配置
 import 'virtual:svg-icons-register'
